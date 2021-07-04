@@ -1,0 +1,1 @@
+# guild2clone
