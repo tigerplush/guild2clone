@@ -34,6 +34,28 @@ jobs:
 
       - name: Build
         run: cmake --build ./build
+
+      - name: Pack Artifacts
+        run: zip --junk-paths ubuntu ${{github.workspace}}/build/client/Guild2CloneClient ${{github.workspace}}/build/server/Guild2CloneServer
+      
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: Test
+          draft: false
+          prerelease: true 
+
+      - name: Upload Release Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ubuntu.zip
+          asset_name: ubuntu.zip
+          asset_content_type: application/zip
   # This workflow contains a single job called "build"
   build-windows:
     # The type of runner that the job will run on
