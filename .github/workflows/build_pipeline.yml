@@ -105,3 +105,28 @@ jobs:
 
       - name: Build
         run: cmake --build ./build
+
+      - name: Pack Artifacts
+        run: zip --junk-paths windows ${{github.workspace}}/build/client/Guild2CloneClient.exe ${{github.workspace}}/build/server/Guild2CloneServer.exe
+
+      - name: Download url file
+        uses: actions/download-artifact@v2
+        with:
+          name: upload-url-file 
+          path: ./
+
+      - name: Set Upload url
+        id: set_upload_url
+        run: |
+          upload_url=`cat ./upload_url`
+          echo ::set-output name=upload_url::$upload_url
+      
+      - name: Upload Release Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.set_upload_url.outputs.upload_url }}
+          asset_path: ./windows.zip
+          asset_name: windows.zip
+          asset_content_type: application/zip
